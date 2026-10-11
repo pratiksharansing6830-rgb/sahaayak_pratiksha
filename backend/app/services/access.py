@@ -4,7 +4,9 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import AccessLevel, Child, Family, FamilyAccess, Migration, User
+from app.models import (
+    AccessLevel, Child, Family, FamilyAccess, FollowUp, Migration, ServiceNeed, User,
+)
 
 
 def get_family_access(
@@ -45,3 +47,28 @@ def get_migration_for_user(db: Session, user: User, migration_id: uuid.UUID, *, 
         raise HTTPException(status.HTTP_404_NOT_FOUND, msg)
     family, _ = get_family_access(db, user, mig.family_id, write=write, not_found=msg)
     return mig, family
+
+
+def get_need_for_user(db: Session, user: User, need_id: uuid.UUID, *, write: bool = False):
+    msg = "Need not found."
+    need = db.get(ServiceNeed, need_id)
+    if need is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, msg)
+    child = db.scalar(select(Child).where(Child.id == need.child_id, Child.deleted_at.is_(None)))
+    if child is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, msg)
+    family, _ = get_family_access(db, user, child.family_id, write=write, not_found=msg)
+    return need, child, family
+
+
+def get_followup_for_user(db: Session, user: User, followup_id: uuid.UUID, *, write: bool = False):
+    msg = "Follow-up not found."
+    fu = db.get(FollowUp, followup_id)
+    if fu is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, msg)
+    need = db.get(ServiceNeed, fu.need_id)
+    child = db.scalar(select(Child).where(Child.id == need.child_id, Child.deleted_at.is_(None)))
+    if child is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, msg)
+    family, _ = get_family_access(db, user, child.family_id, write=write, not_found=msg)
+    return fu, need, child, family

@@ -13,7 +13,7 @@ from app.schemas.migration import (
 )
 from app.services.access import get_family_access, get_migration_for_user
 from app.services.audit import log_event
-
+from app.services.continuity import review_needs_after_destination_change
 router = APIRouter(tags=["migrations"])
 citizen_only = require_roles(Role.CITIZEN)
 family_user = require_roles(Role.CITIZEN, Role.NGO)
@@ -98,7 +98,9 @@ def update_migration(
               entity_id=mig.id, to_value=",".join(sorted(real))[:100])
     if "destination_district" in real or "destination_state" in real:
         log_event(db, actor=user, action="MIGRATION_DESTINATION_CHANGED", entity_type="migration",
-                  entity_id=mig.id, from_value=old_destination, to_value=mig.destination_district)
+                entity_id=mig.id, from_value=old_destination, to_value=mig.destination_district)
+        review_needs_after_destination_change(db, mig, user)
+   
     db.commit()
     db.refresh(mig)
     return mig
