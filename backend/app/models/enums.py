@@ -1,0 +1,128 @@
+import enum
+
+
+class Role(str, enum.Enum):
+    CITIZEN = "CITIZEN"
+    SCHOOL = "SCHOOL"
+    HEALTHCARE = "HEALTHCARE"
+    NGO = "NGO"
+    GOVERNMENT = "GOVERNMENT"
+    ADMIN = "ADMIN"
+
+
+class OrgType(str, enum.Enum):
+    SCHOOL = "SCHOOL"
+    HEALTHCARE = "HEALTHCARE"
+    NGO = "NGO"
+    GOVERNMENT = "GOVERNMENT"
+    OTHER = "OTHER"
+
+
+class AccessLevel(str, enum.Enum):
+    OWNER = "OWNER"
+    MEMBER = "MEMBER"
+    SUPPORT_WORKER = "SUPPORT_WORKER"
+
+
+class EducationStatus(str, enum.Enum):
+    ENROLLED = "ENROLLED"
+    NOT_ENROLLED = "NOT_ENROLLED"
+    DROPPED_OUT = "DROPPED_OUT"
+    UNKNOWN = "UNKNOWN"
+
+
+class MigrationStatus(str, enum.Enum):
+    PLANNED = "PLANNED"
+    ACTIVE = "ACTIVE"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
+
+
+class ServiceCategory(str, enum.Enum):
+    EDUCATION = "EDUCATION"
+    HEALTHCARE = "HEALTHCARE"
+    NUTRITION = "NUTRITION"
+    WELLBEING = "WELLBEING"
+    PROTECTION = "PROTECTION"
+    INCLUSION = "INCLUSION"
+
+
+class VerificationStatus(str, enum.Enum):
+    SAMPLE = "SAMPLE"          # demo data, not a real service
+    UNVERIFIED = "UNVERIFIED"
+    VERIFIED = "VERIFIED"
+
+
+class NeedStatus(str, enum.Enum):
+    NEEDS_ASSESSMENT = "NEEDS_ASSESSMENT"
+    PENDING = "PENDING"
+    REFERRED = "REFERRED"
+    AWAITING_PROVIDER_RESPONSE = "AWAITING_PROVIDER_RESPONSE"
+    FOLLOW_UP_REQUIRED = "FOLLOW_UP_REQUIRED"
+    BARRIER_IDENTIFIED = "BARRIER_IDENTIFIED"
+    REVIEW_REQUIRED = "REVIEW_REQUIRED"
+    SUPPORT_CONFIRMED = "SUPPORT_CONFIRMED"
+    NOT_REQUIRED = "NOT_REQUIRED"
+    CLOSED = "CLOSED"
+
+
+class ReferralStatus(str, enum.Enum):
+    RECORDED = "RECORDED"      # family/worker recorded it; provider has not acted
+    ACCEPTED = "ACCEPTED"
+    INFO_REQUESTED = "INFO_REQUESTED"
+    DECLINED = "DECLINED"
+    NO_RESPONSE = "NO_RESPONSE"
+    WITHDRAWN = "WITHDRAWN"
+
+
+class ContactMethod(str, enum.Enum):
+    PHONE = "PHONE"
+    VISIT = "VISIT"
+    MESSAGE = "MESSAGE"
+    OTHER = "OTHER"
+
+
+class ContactResult(str, enum.Enum):
+    REACHED = "REACHED"
+    NO_ANSWER = "NO_ANSWER"
+    INFO_REQUESTED = "INFO_REQUESTED"
+    OTHER = "OTHER"
+
+
+class ProviderResponseType(str, enum.Enum):
+    RECEIVED = "RECEIVED"
+    ACCEPTED = "ACCEPTED"
+    INFO_REQUESTED = "INFO_REQUESTED"
+    DECLINED = "DECLINED"
+    SERVICE_PROVIDED = "SERVICE_PROVIDED"
+
+
+class FollowUpAction(str, enum.Enum):
+    CONTACT_SCHOOL = "CONTACT_SCHOOL"
+    REQUEST_TRANSFER_UPDATE = "REQUEST_TRANSFER_UPDATE"
+    CONTACT_HEALTHCARE = "CONTACT_HEALTHCARE"
+    EXPLORE_ALTERNATIVE = "EXPLORE_ALTERNATIVE"
+    REQUEST_MISSING_INFO = "REQUEST_MISSING_INFO"
+    SCHEDULE_FOLLOW_UP = "SCHEDULE_FOLLOW_UP"
+    ESCALATE_SAFEGUARDING = "ESCALATE_SAFEGUARDING"
+
+
+class FollowUpStatus(str, enum.Enum):
+    OPEN = "OPEN"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
+
+
+class Priority(str, enum.Enum):
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    URGENT = "URGENT"
+
+
+class ConfirmationMethod(str, enum.Enum):
+    PROVIDER_CONFIRMED = "PROVIDER_CONFIRMED"
+    FAMILY_REPORTED = "FAMILY_REPORTED"        # not provider-verified
+    SUPPORT_WORKER_OBSERVED = "SUPPORT_WORKER_OBSERVED"
+    DOCUMENT_SEEN = "DOCUMENT_SEEN"
