@@ -32,8 +32,10 @@ def build_summary(db: Session, family: Family) -> ContinuitySummary:
                 .where(OutcomeConfirmation.need_id.in_([n.id for n in needs]))
                 .order_by(OutcomeConfirmation.confirmed_at.desc())
             ).all()
-            for r in rows:
-                latest_confirmation.setdefault(r.need_id, r)
+            for r in rows:  # newest first; a provider-verified record always beats a family report
+                cur = latest_confirmation.get(r.need_id)
+                if cur is None or (r.provider_verified and not cur.provider_verified):
+                    latest_confirmation[r.need_id] = r
 
     open_n = overdue_n = by_provider = by_family = not_required = closed = not_assessed = 0
     summary_children: list[SummaryChild] = []

@@ -4,7 +4,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
+from app.services.locations import require_location
 from app.api.deps import require_roles
 from app.core.database import get_db
 from app.models import Migration, MigrationStatus, Role, User
@@ -35,7 +35,10 @@ def create_migration(
     user: User = Depends(citizen_only), db: Session = Depends(get_db),
 ):
     family, _ = get_family_access(db, user, family_id, write=True)
-    mig = Migration(family_id=family.id, **payload.model_dump())
+    data = payload.model_dump()
+    dest = require_location(data["destination_district"], data["destination_state"])  # 422, never a default
+    data["destination_district"], data["destination_state"] = dest.district, dest.state
+    mig = Migration(family_id=family.id, **data)
     db.add(mig)
     db.flush()
     log_event(db, actor=user, action="MIGRATION_CREATED", entity_type="migration",
@@ -75,7 +78,14 @@ def update_migration(
     if mig.status in (S.COMPLETED, S.CANCELLED):
         raise HTTPException(409, "Completed or cancelled migrations can no longer be edited.")
 
+   
     changes = payload.model_dump(exclude_unset=True)
+    if "destination_district" in changes or "destination_state" in changes:
+        dest = require_location(
+            changes.get("destination_district", mig.destination_district),
+            changes.get("destination_state", mig.destination_state),
+        )
+        changes["destination_district"], changes["destination_state"] = dest.district, dest.state
     real = {k: v for k, v in changes.items() if getattr(mig, k) != v}
     if not real:
         return mig

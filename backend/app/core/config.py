@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
+from pydantic import model_validator
 
 class Settings(BaseSettings):
     app_name: str = "Sahaayak"
@@ -15,6 +15,16 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+    @model_validator(mode="after")
+    def production_needs_real_secret(self):
+        if self.environment.lower() == "production" and (
+            len(self.secret_key) < 32 or self.secret_key.upper().startswith("CHANGE_ME")
+        ):
+            raise ValueError("SECRET_KEY must be a long random value in production.")
+        return self
 
+    @property
+    def is_production(self) -> bool:
+        return self.environment.lower() == "production"
 
 settings = Settings()

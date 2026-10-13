@@ -8,3 +8,7 @@ dist/
 .coverage
 *.db
 .DS_Store
+.env.*
+!.env.example
+htmlcov/
+.mypy_cache/

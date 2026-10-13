@@ -69,3 +69,28 @@ def journey(client, db, email="family@example.com", education="NOT_ENROLLED", do
     if do_assess:
         needs = {n["category"]: n for n in assess(client, h, mig["id"])["needs"]}
     return h, fam, child, mig, needs
+def make_listing(db, name="Test School", category=None, district="Pune", **kw):
+    from app.models import ServiceCategory, ServiceListing
+
+    s = ServiceListing(
+        name=name, category=category or ServiceCategory.EDUCATION,
+        district=district, state="Maharashtra", **kw,
+    )
+    db.add(s)
+    db.flush()
+    return s
+def make_provider(db, role=None, email="school@example.com", org_name="Test School Org",
+                  listing_name="School A", category=None):
+    """An organisation, a provider user in it, and a directory listing owned by that organisation."""
+    from app.models import Organization, OrgType, ServiceCategory
+
+    role = role or Role.SCHOOL
+    org_type = {Role.SCHOOL: OrgType.SCHOOL, Role.HEALTHCARE: OrgType.HEALTHCARE, Role.NGO: OrgType.NGO}[role]
+    default_cat = {Role.SCHOOL: ServiceCategory.EDUCATION, Role.HEALTHCARE: ServiceCategory.HEALTHCARE,
+                   Role.NGO: ServiceCategory.PROTECTION}[role]
+    org = Organization(name=org_name, org_type=org_type, district="Pune", state="Maharashtra")
+    db.add(org)
+    db.flush()
+    user = make_user(db, email, role, organization_id=org.id)
+    listing = make_listing(db, listing_name, category or default_cat, organization_id=org.id)
+    return org, user, listing

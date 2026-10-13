@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import (
-    AccessLevel, Child, Family, FamilyAccess, FollowUp, Migration, ServiceNeed, User,
+    AccessLevel, Child, Family, FamilyAccess, FollowUp, Migration,Referral, ServiceNeed, User,
 )
 
 
@@ -72,3 +72,15 @@ def get_followup_for_user(db: Session, user: User, followup_id: uuid.UUID, *, wr
         raise HTTPException(status.HTTP_404_NOT_FOUND, msg)
     family, _ = get_family_access(db, user, child.family_id, write=write, not_found=msg)
     return fu, need, child, family
+def get_referral_for_user(db: Session, user: User, referral_id: uuid.UUID, *, write: bool = False):
+    msg = "Referral not found."
+    ref = db.get(Referral, referral_id)
+    if ref is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, msg)
+    try:
+        need, child, family = get_need_for_user(db, user, ref.need_id, write=write)
+    except HTTPException as e:
+        if e.status_code == status.HTTP_404_NOT_FOUND:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, msg)  # same message either way
+        raise
+    return ref, need, child, family
